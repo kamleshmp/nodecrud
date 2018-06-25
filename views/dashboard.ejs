@@ -1,0 +1,23 @@
+<%- include layouts/header.ejs %>
+        <div class="page-data">
+         <div class="data-btn">
+         </div>
+         <div class="data-table">
+         	<select>
+
+                <% if(data.length){ 
+                 for(var i = 0;i < data.length;i++) { %>
+                 
+             	<option><%=data[i].table_name%></option>
+            	<% }
+
+
+             } %>
+                
+            </select>             
+              
+                
+         </div>
+        </div>
+        
+<%- include layouts/footer.ejs %>

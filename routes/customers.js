@@ -24,11 +24,11 @@ exports.list = function(req, res){
   //        //console.log(query.sql);
   //   });
 
-  // db.query('INSERT INTO customers (name) VALUES ("name");')
-   db.query('SELECT * FROM customers')
+  db.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
+   // db.query('SELECT * FROM customers')
   .then(function (data) {
     console.log('DATA:', data)
-    res.render('customers',{page_title:"Customers - Node.js",data:data});
+    res.render('customers',{page_title:"Customers - Node.js",data: data});
   })
   .catch(function (error) {
     console.log('ERROR:', error)
