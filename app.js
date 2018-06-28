@@ -10,7 +10,6 @@ var path = require('path');
 var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
 
 //load customers route
-var customers = require('./routes/customers'); 
 var dashboard = require('./routes/dashboard'); 
 
 var app = express();
@@ -40,38 +39,12 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-/*------------------------------------------
-    connection peer, register as middleware
-    type koneksi : single,pool and request 
--------------------------------------------*/
-
-// app.use(
-    
-//     connection(mysql,{
-        
-//         host: 'mysql://mysql:3306/', //'localhost',
-//         user: 'userEHX',
-//         password : 'hMmx56FN4GHpMXOl',
-//         port : 3306, //port mysql
-//         database:'sampledb'
-
-//     },'pool') //or single
-
-// );
-
-
 
 app.get('/', routes.index);
 app.get('/api/all_tables',dashboard.tables);
 app.post('/api/table_details', dashboard.tableDetails);
-app.get('/customers/add', customers.add);
-app.post('/customers/add', customers.save);
-app.get('/customers/delete/:id', customers.delete_customer);
-app.get('/customers/edit/:id', customers.edit);
-app.post('/customers/edit/:id',customers.save_edit);
-
-
-
+app.post('/api/table_columns', dashboard.tableColumns);
+app.post('/api/download_tables', dashboard.downloadTables);
 
 app.use(app.router);
 
