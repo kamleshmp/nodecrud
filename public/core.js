@@ -19,7 +19,6 @@ function mainController($scope, $http) {
     $scope.getTableInfo = function(table_name) {
         $scope.tableDetails = [];
         $scope.tableHeadings = [];
-        console.log({ table: $scope.tableName })
         $http.post('/api/table_details', JSON.stringify({ table: $scope.tableName }))
             .success(function(res) {
                 if (res.data.length) {
@@ -81,7 +80,6 @@ function mainController($scope, $http) {
             }
         }
         $scope.tablesToDownload[table] = data;
-        console.log($scope.tablesToDownload)
     }
 
     $scope.showDownload = function() {
@@ -91,11 +89,21 @@ function mainController($scope, $http) {
     $scope.showPreview = function() {
         var array_values = [];
         for (var key in $scope.tablesToDownload) {
-            array_values.concat($scope.tablesToDownload[key]);
+            array_values = array_values.concat($scope.tablesToDownload[key]);
         }
-        alert(array_values.length)
+        
+        if(array_values.length == 0) {
+            alert('Please select fields');
+            $scope.tablePreview = [];
+            $scope.tablePreviewColumns = [];
+            return;
+        }
+        
         if (Object.keys($scope.tablesToDownload).length) {
-            console.log('data', $scope.tablesToDownload)
+            for (var key in $scope.tablesToDownload) {
+                $scope.tablesToDownload[key].length == 0 ? delete $scope.tablesToDownload[key] : ''
+            }
+
             $http.post('/api/download_tables', JSON.stringify({tables: $scope.tablesToDownload}))
             .success(function(res) {
                 if (res.data.length) {

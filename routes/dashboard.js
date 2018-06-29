@@ -3,34 +3,20 @@
  * GET users listing.
  */
 
-var pgp = require('pg-promise')(/*options*/)
-var db = pgp('postgres://postgres:postgres@localhost:5432/my-db')
+var pgp = require('pg-promise')(/*options*/);
+
+var config = {
+  POSTGRES_USER_NAME: '', // your postgres username
+  POSTGRES_PASSWORD: '' // your postgres upassword
+}
+
+
+var db = pgp('postgres://'+config.POSTGRES_USER_NAME+':'+config.POSTGRES_PASSWORD+'@localhost:5432/my-db')
 
 exports.tables = function(req, res){
-
-  // req.getConnection(function(err,connection){
-       
-  //       var query = connection.query('SELECT * FROM customer',function(err,rows)
-  //       {
-            
-  //           if(err)
-  //               console.log("Error Selecting : %s ",err );
-     
-  //           res.render('customers',{page_title:"Customers - Node.js",data:rows});
-                
-           
-  //        });
-         
-  //        //console.log(query.sql);
-  //   });
-
   db.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
-   // db.query('SELECT * FROM customers')
   .then(function (data) {
-    console.log('DATA:', data)
     res.json({data: data});
-
-    // res.render('dashboard',{page_title:"Customers - Node.js",data: data});
   })
   .catch(function (error) {
     console.log('ERROR:', error)
@@ -39,31 +25,9 @@ exports.tables = function(req, res){
 };
 
 exports.tableDetails = function(req, res) {
-
-  // req.getConnection(function(err,connection){
-       
-  //       var query = connection.query('SELECT * FROM customer',function(err,rows)
-  //       {
-            
-  //           if(err)
-  //               console.log("Error Selecting : %s ",err );
-     
-  //           res.render('customers',{page_title:"Customers - Node.js",data:rows});
-                
-           
-  //        });
-         
-  //        //console.log(query.sql);
-  //   });
-
-  console.log('req', req.body)
   db.query("SELECT * from " + req.body.table)
-   // db.query('SELECT * FROM customers')
   .then(function (data) {
-    console.log('DATA:', data)
     res.json({data: data});
-
-    // res.render('dashboard',{page_title:"Customers - Node.js",data: data});
   })
   .catch(function (error) {
     console.log('ERROR:', error)
@@ -71,10 +35,8 @@ exports.tableDetails = function(req, res) {
 }
 exports.tableColumns = function(req, res) {
     db.query("select column_name from information_schema.columns where table_name='" + req.body.table + "'")
-        // db.query('SELECT * FROM customers')
         .then(function(data) {
             res.json({ data: data });
-            // res.render('dashboard',{page_title:"Customers - Node.js",data: data});
         })
         .catch(function(error) {
             console.log('ERROR:', error)
@@ -82,7 +44,6 @@ exports.tableColumns = function(req, res) {
 };
 
 exports.downloadTables = function(req, res) {
-
   var query = "";
   var fields = "";
   var tables = req.body.tables;
@@ -125,30 +86,15 @@ exports.downloadTables = function(req, res) {
     }
 
   }
-  console.log('query', query);
-  db.query(query)
-   // db.query('SELECT * FROM customers')
-  .then(function (data) {
-    // console.log('DATAdddddddd', data)
-    res.json({data: data});
-  })
-  .catch(function (error) {
-    console.log('ERROR:', error)
-  })
-
-
-
-// SELECT tasks.t_name, tasks.slider_id , services.name from tasks 
-
-// INNER JOIN services ON services.slider_id = tasks.slider_id 
-
-// INNER JOIN products ON products.slider_id = tasks.slider_id 
-
-// INNER JOIN news ON news.slider_id = tasks.slider_id
-
-
-
-  
+  setTimeout(function() {
+	  db.query(query)
+	  .then(function (data) {
+	    res.json({data: data});
+	  })
+	  .catch(function (error) {
+	    console.log('ERROR:', error)
+	  })
+  },1000);
 };
 
 
