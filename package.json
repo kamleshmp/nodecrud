@@ -6,10 +6,11 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "async": "^2.6.1",
+    "body-parser": "~1.5.2",
     "ejs": "^1.0.0",
     "express": "3.5.1",
     "express-myconnection": "1.0.4",
-    "body-parser": "~1.5.2",
     "jade": "*",
     "mysql": "2.2.0",
     "pg": "^7.4.3",

@@ -104,11 +104,20 @@ function mainController($scope, $http) {
                 $scope.tablesToDownload[key].length == 0 ? delete $scope.tablesToDownload[key] : ''
             }
 
+            var finalData =[];
             $http.post('/api/download_tables', JSON.stringify({tables: $scope.tablesToDownload}))
             .success(function(res) {
                 if (res.data.length) {
                     $scope.tablePreview = res.data;
-                    $scope.tablePreviewColumns = Object.keys(res.data[0])
+
+                    for(var i=0; i< res.data.length; i++ ){
+                        var hashKeys = Object.keys(res.data[i]);
+                        finalData = finalData.concat(hashKeys)
+                    }
+
+                    var unique = finalData.filter(function(v, i, a){ return a.indexOf(v) === i}); 
+                    $scope.tablePreviewColumns = unique;
+
                 }
             })
             .error(function(data) {
