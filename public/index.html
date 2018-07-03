@@ -1,141 +1,199 @@
 <!-- index.html -->
 <!doctype html>
 <!-- ASSIGN OUR ANGULAR MODULE -->
-<html ng-app="scotchTodo">
+<html ng-app="app">
 
 <head>
-    <!-- META -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Optimize mobile viewport -->
-    <title>Node/Angular Todo App</title>
-    <!-- SCROLLS -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-    <!-- load bootstrap -->
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.css">
-    <!-- SPELLS -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <!-- load jquery -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
-    <!-- load angular -->
-    <script src="core.js"></script>
-    <link rel="stylesheet" type="text/css" href="./jquery.dropdown.css">
-    <script src="./jquery.dropdown.js"></script>
-    <script type="text/javascript" src="./ng-table-excel-export.min.js"></script>
-    <style type="text/css">
-    .column-panel {
-        height: 300px;
-        overflow-y: scroll;
-    }
-    </style>
+  <!-- META -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Optimize mobile viewport -->
+  <title>Node/Angular Todo App</title>
+  <!-- SCROLLS -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+  <!-- load bootstrap -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-dropdown/2.0.3/jquery.dropdown.css">
+  <!-- SPELLS -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <!-- load jquery -->
+  <script src="//netdna.bootstrapcdn.com/bootstrap/2.0.4/js/bootstrap.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+  <script src="https://rawgithub.com/cletourneau/angular-bootstrap-datepicker/master/dist/angular-bootstrap-datepicker.js" charset="utf-8"></script>
+  <!-- load angular -->
+  <script src="core.js"></script>
+  <link rel="stylesheet" type="text/css" href="./jquery.dropdown.css">
+  <script src="./jquery.dropdown.js"></script>
+  <script type="text/javascript" src="./ng-table-excel-export.min.js"></script>
+  <style type="text/css">
+  .column-panel {
+    height: 300px;
+    overflow-y: scroll;
+  }
+
+  .loading-img {
+    height: 80px;
+  }
+
+  .ng-invalid {
+    border: 1px solid red;
+  }
+
+  .loading-spiner-holder {
+    margin-top: 2%;
+  }
+
+  .custom-btns {
+    margin-top: 18px;
+    margin-left: 11%;
+  }
+
+  </style>
 </head>
 <!-- SET THE CONTROLLER AND GET ALL TODOS -->
 
 <body ng-controller="mainController">
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <a class="navbar-brand" href="#">Brand</a>
-            </div>
-        </div>
-        <!-- /.container-fluid -->
-    </nav>
-    <div class="container">
-        <div class="bs-example">
-            <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#sectionA">Tables</a></li>
-                <li><a data-toggle="tab" href="#sectionB">Download</a></li>
-            </ul>
-            <div class="tab-content">
-                <div id="sectionA" class="tab-pane fade in active">
-                    <h3 class="text-center">Select Table</h3>
-                    <!-- TODO LIST -->
-                    <div id="todo-list" class="row">
-                        <div class="col-sm-4 col-sm-offset-4">
-                            <select ng-change="getTableInfo(table)" ng-model="tableName" class="form-control">
-                                <!-- LOOP OVER THE TODOS IN $scope.todos -->
-                                <option ng-repeat="table in tables">{{table.table_name}}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- FORM TO CREATE TODOS -->
-                    <h3 ng-show="tableName">TABLE: {{tableName}}</h3>
-                    <table class="table  table-condensed table-bordered">
-                        <thead>
-                            <tr>
-                                <th ng-repeat="row in tableHeadings">{{row}}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="row in tableDetails">
-                                <td ng-repeat="column in tableHeadings">{{row[column]}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="text-center" ng-show="tableHeadings.length == 0 && tableName"> NO DATA FOUND</div>
-                </div>
-                <div id="sectionB" class="tab-pane fade">
-                    <h3>Select tables to download</h3>
-                    <div class="demo">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="dropdown-mul-2">
-                                    <select style="display:none" name="" id="mul-2" multiple placeholder="Select">
-                                        <option ng-repeat="table in tables" value={{table.table_name}}>{{table.table_name}}</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="panel-group col-md-4" ng-repeat="(k, v) in selectedColumns">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">Table: {{k}}</div>
-                                <div class="column-panel">
-                                    <div class="panel-body" >
-                                        <!-- <label for={{k+column.column_name}}>
-                                            <input id={{k+column.column_name}} type="checkbox" ng-model="models[k+column.column_name]" ng-change="addColumn(k, column.column_name)" name="">{{column.column_name}}
-                                        </label> -->
-
-                                        <div class="checkbox" ng-repeat="column in v">
-                                            <label for={{k+column.column_name}}>
-                                                <input id={{k+column.column_name}} type="checkbox" ng-model="models[k+column.column_name]" ng-change="addColumn(k, column.column_name)" name="">{{column.column_name}}</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div ng-show="showDownload()">
-                        <button class="btn btn-primary" ng-click="showPreview()">Show Preview</button>
-                        <a ng-show="tablePreviewColumns.length > 0 " class="btn btn-primary" download="download.xls" href="#" onclick="return ngTableExcelExport.excel(this, 'datatable', 'Sheet Name Here');">Export to Excel</a>
-                        <a ng-show="tablePreviewColumns.length > 0 " class="btn btn-primary" download="download.csv" href="#" onclick="return ngTableExcelExport.csv(this, 'datatable', 'Sheet Name Here');">Export to CSV</a>
-                    </div>
-                    <br>
-                    <div class="container">
-                        <div class="row">
-                            <table class="table  table-condensed table-bordered" id="datatable">
-                                <thead>
-                                    <tr>
-                                        <th ng-repeat="row in tablePreviewColumns">{{row}}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="row in tablePreview">
-                                        <td ng-repeat="column in tablePreviewColumns">{{row[column]}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">Brand</a>
+      </div>
     </div>
+    <!-- /.container-fluid -->
+  </nav>
+  <div class="container">
+    <div class="bs-example">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#sectionA">Tables</a></li>
+        <li><a data-toggle="tab" href="#sectionB">Download</a></li>
+      </ul>
+      <div class="tab-content">
+        <div id="sectionA" class="tab-pane fade in active">
+          <h3 class="text-center">Select Table</h3>
+          <!-- TODO LIST -->
+          <div id="todo-list" class="row">
+            <div class="col-sm-4 col-sm-offset-4">
+              <select ng-change="getTableInfo(table)" ng-model="tableName" class="form-control">
+                <!-- LOOP OVER THE TODOS IN $scope.todos -->
+                <option ng-repeat="table in tables">{{table.table_name}}</option>
+              </select>
+            </div>
+          </div>
+          <br>
+          <div class="loading-spiner-holder text-center" data-loading>
+            <div class="loading-spiner">
+              <img class="loading-img" src="./images/loader.gif" /></div>
+          </div>
+          <br>
+          <!-- FORM TO CREATE TODOS -->
+          <h3 ng-show="tableName">TABLE: {{tableName}}</h3>
+          <table class="table  table-condensed table-bordered">
+            <thead>
+              <tr>
+                <th ng-repeat="row in tableHeadings">{{row}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in tableDetails">
+                <td ng-repeat="column in tableHeadings">{{row[column]}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center" ng-show="tableHeadings.length == 0 && tableName"> NO DATA FOUND</div>
+        </div>
+        <div id="sectionB" class="tab-pane fade">
+          <h3>Select tables to download</h3>
+          <div class="demo">
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="dropdown-mul-2">
+                  <select style="display:none" name="" id="mul-2" multiple placeholder="Select">
+                    <option ng-repeat="table in tables" value={{table.table_name}}>{{table.table_name}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="row">
+            <div class="panel-group col-md-4" ng-repeat="(k, v) in selectedColumns">
+              <div class="panel panel-default">
+                <div class="panel-heading">Table: {{k}}</div>
+                <div class="column-panel">
+                  <div class="panel-body">
+                    <div class="checkbox" ng-repeat="column in v">
+                      <label for={{k+column.column_name}}>
+                        <input id={{k+column.column_name}} type="checkbox" ng-model="models[k+column.column_name]" ng-change="addColumn(k, column.column_name)" name="">{{column.column_name}}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div ng-show="showDownload()" class="col-md-12">
+            <table>
+                <tr>
+                    <td>From Date 
+                        <input id="datepicker" type="text" data-ng-datepicker data-ng-options="datepickerOptions" data-ng-model="fromDate"></td>
+                    <td>To Date 
+                        <input id="datepicker2" type="text" data-ng-datepicker data-ng-options="datepickerOptions" data-ng-model="toDate"></td>
+                    <td><span class="sliderId">Slider Id </span> <br>
+                        <input  type="text" allow-only-numbers ng-model="sliderId"></td>
+
+                    
+                </tr>
+
+                <tr>
+
+                    <td  ng-show="tablePreviewColumns.length > 0">Limit to download 
+                       <input class="form-control" allow-only-numbers  type="text" ng-model="limit" placeholder="Enter download limit"></td>
+
+                    <td> <button class="btn btn-primary custom-btns" ng-click="showPreview('data')">Show Preview</button></td>
+                    <td ng-show="tablePreviewColumns.length > 0"><a  class="btn btn-primary custom-btns" download="download.xls" href="#" onclick="return ngTableExcelExport.excel(this, 'datatable', 'Sheet Name Here');">Export to Excel</a></td>
+                    <td ng-show="tablePreviewColumns.length > 0"><a  class="btn btn-primary custom-btns" download="download.csv" href="#" onclick="return ngTableExcelExport.csv(this, 'datatable', 'Sheet Name Here');">Export to CSV</a></td>
+                    <td ng-show="tablePreviewColumns.length > 0"><button  class="btn btn-primary custom-btns" ng-click="showPreview('sqlString')">Show SQL String</button></td>
+                </tr>
+            </table>
+          </div>
+          <br>
+          <div class="loading-spiner-holder text-center" data-loading>
+            <div class="loading-spiner">
+              <img class="loading-img" src="./images/loader.gif" /></div>
+          </div>
+          <br>
+          <div class="container" ng-show="!noQueryString">
+            <div class="row">
+              <table class="table  table-condensed table-bordered" id="datatable">
+                <thead>
+                  <tr>
+                    <th ng-repeat="row in tablePreviewColumns">{{row}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="row in tablePreview">
+                    <td ng-repeat="column in tablePreviewColumns">{{row[column]}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div ng-show="!noQueryString && tablePreviewColumns.length == 0 && showData" showData>
+            <h3 class="text-center"> NO DATA FOUND</h3>
+          </div>
+          <div ng-show="noQueryString && tablePreviewColumns.length == 0">
+            <p class="text-center"> {{sqlString}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
+
+<script type="text/javascript">
+    $('#datepicker').attr('readonly', true);
+     $('#datepicker2').attr('readonly', true);
+</script>

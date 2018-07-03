@@ -1,4 +1,4 @@
-var scotchTodo = angular.module('scotchTodo', []);
+var app = angular.module('app', ['ng-bootstrap-datepicker']);
 
 function mainController($scope, $http) {
     $scope.selectedColumns = {};
@@ -6,6 +6,17 @@ function mainController($scope, $http) {
     $scope.tablesToDownload = {};
     $scope.tablePreview = [];
     $scope.tablePreviewColumns = [];
+    $scope.limit = 10;
+
+    $scope.datepickerOptions = {
+        format: 'yyyy-mm-dd',
+        timezone:'UTC',
+        language: 'en',
+        autoclose: true,
+        weekStart: 0
+    }
+
+   
     // when landing on the page, get all todos and show them
     $http.get('/api/all_tables')
         .success(function(res) {
@@ -17,13 +28,15 @@ function mainController($scope, $http) {
 
     // when submitting the add form, send the text to the node API
     $scope.getTableInfo = function(table_name) {
-        $scope.tableDetails = [];
-        $scope.tableHeadings = [];
+        
         $http.post('/api/table_details', JSON.stringify({ table: $scope.tableName }))
             .success(function(res) {
                 if (res.data.length) {
                     $scope.tableHeadings = Object.keys(res.data[0]);
                     $scope.tableDetails = res.data
+                } else {
+                    $scope.tableDetails = [];
+                    $scope.tableHeadings = [];
                 }
             })
             .error(function(data) {
@@ -86,7 +99,12 @@ function mainController($scope, $http) {
         return Object.keys($scope.selectedColumns).length > 0 ? true : false;
     }
 
-    $scope.showPreview = function() {
+    $scope.checkFromDate = function(){
+        console.log($scope.fromDate)
+    }
+
+    $scope.showPreview = function(queryType) {
+        $scope.showData = false;
         var array_values = [];
         for (var key in $scope.tablesToDownload) {
             array_values = array_values.concat($scope.tablesToDownload[key]);
@@ -104,11 +122,27 @@ function mainController($scope, $http) {
                 $scope.tablesToDownload[key].length == 0 ? delete $scope.tablesToDownload[key] : ''
             }
 
-            $http.post('/api/download_tables', JSON.stringify({tables: $scope.tablesToDownload}))
+            
+            $http.post('/api/download_tables', 
+                JSON.stringify({queryType: queryType, tables: $scope.tablesToDownload, 
+                    limit: $scope.limit, fromDate: $scope.fromDate, toDate: $scope.toDate
+                    , sliderId: $scope.sliderId}))
             .success(function(res) {
                 if (res.data.length) {
+                    $scope.noQueryString = false;
                     $scope.tablePreview = res.data;
                     $scope.tablePreviewColumns = Object.keys(res.data[0])
+                } else if(res.sqlString) {
+                    $scope.tablePreview = [];
+                    $scope.tablePreviewColumns = [];
+                    $scope.noQueryString = true;
+                    $scope.sqlString = res.sqlString;
+                } else {
+                    $scope.tablePreview = [];
+                    $scope.tablePreviewColumns = [];
+                    $scope.noQueryString = false;
+                    $scope.sqlString = '';
+                    $scope.showData = true;
                 }
             })
             .error(function(data) {
@@ -121,3 +155,58 @@ function mainController($scope, $http) {
     }
 
 }
+
+
+app.directive('loading',   ['$http' ,function ($http)
+    {
+        return {
+            restrict: 'A',
+            link: function (scope, elm, attrs)
+            {
+                scope.isLoading = function () {
+                    return $http.pendingRequests.length > 0;
+                };
+
+                scope.$watch(scope.isLoading, function (v)
+                {
+                    if(v){
+                        elm.show();
+                    }else{
+                        elm.hide();
+                    }
+                });
+            }
+        };
+
+    }]);
+app.directive('allowOnlyNumbers', function () {  
+    return {  
+        restrict: 'A',  
+        link: function (scope, elm, attrs, ctrl) {  
+            elm.on('keydown', function (event) {  
+                var $input = $(this);  
+                var value = $input.val();  
+                value = value.replace(/[^0-9]/g, '')  
+                $input.val(value);  
+                if (event.which == 64 || event.which == 16) {  
+                    // to allow numbers  
+                    return false;  
+                } else if (event.which >= 48 && event.which <= 57) {  
+                    // to allow numbers  
+                    return true;  
+                } else if (event.which >= 96 && event.which <= 105) {  
+                    // to allow numpad number  
+                    return true;  
+                } else if ([8, 13, 27, 37, 38, 39, 40].indexOf(event.which) > -1) {  
+                    // to allow backspace, enter, escape, arrows  
+                    return true;  
+                } else {  
+                    event.preventDefault();  
+                    // to stop others  
+                    //alert("Sorry Only Numbers Allowed");  
+                    return false;  
+                }  
+            });  
+        }  
+    }  
+}); 

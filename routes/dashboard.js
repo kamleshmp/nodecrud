@@ -6,12 +6,13 @@
 var pgp = require('pg-promise')(/*options*/);
 
 var config = {
-  POSTGRES_USER_NAME: '', // your postgres username
-  POSTGRES_PASSWORD: '' // your postgres upassword
+  POSTGRES_USER_NAME: 'postgres', // your postgres username
+  POSTGRES_PASSWORD: 'postgres', // your postgres upassword
+  DATABASE_NAME: 'mydb'
 }
 
 
-var db = pgp('postgres://'+config.POSTGRES_USER_NAME+':'+config.POSTGRES_PASSWORD+'@localhost:5432/my-db')
+var db = pgp('postgres://'+config.POSTGRES_USER_NAME+':'+config.POSTGRES_PASSWORD+'@localhost:5432/'+config.DATABASE_NAME)
 
 exports.tables = function(req, res){
   db.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
@@ -48,6 +49,7 @@ exports.downloadTables = function(req, res) {
   var fields = "";
   var tables = req.body.tables;
   var keys = Object.keys(tables);
+  var singleTable = keys[0];
   if(keys.length == 1) {
     var singleTable = keys[0];
     var rows = tables[singleTable];
@@ -86,14 +88,52 @@ exports.downloadTables = function(req, res) {
     }
 
   }
+
   setTimeout(function() {
-	  db.query(query)
-	  .then(function (data) {
-	    res.json({data: data});
-	  })
-	  .catch(function (error) {
-	    console.log('ERROR:', error)
-	  })
+    var fromDate = new Date(req.body.fromDate);
+    var frommonth = fromDate.getUTCMonth() + 1; //months from 1-12
+    var fromday = fromDate.getUTCDate();
+    var fromyear = fromDate.getUTCFullYear();
+    var newFromDate = fromyear + "-" + frommonth + "-" + fromday+ " 00:00:00.000"
+
+
+    var toDate = new Date(req.body.toDate);
+    var tomonth = toDate.getUTCMonth() + 1; //months from 1-12
+    var today = toDate.getUTCDate();
+    var toyear = toDate.getUTCFullYear();
+    var newToDate = toyear + "-" + tomonth + "-" + today
+
+    //query += " WHERE "+singleTable+".from_date >= '2012-03-08 00:00:00.000'"+ " AND "+singleTable+".to_date <= '2019-03-08 01:00:00.000'" 
+     
+     if(req.body.fromDate && req.body.toDate) {
+       query += " WHERE "+singleTable+".from_date >="+ "'"+req.body.fromDate+"'" + " AND "+singleTable+".to_date <= "+"'"+req.body.toDate+"'"
+     } else if (req.body.fromDate) {
+       query += " WHERE "+singleTable+".from_date >="+ "'"+req.body.fromDate+"'"
+     } else if (req.body.toDate) {
+       query += " WHERE "+singleTable+".to_date <="+ "'"+req.body.toDate+"'"
+     }
+    
+    if(req.body.sliderId && !req.body.fromDate && !req.body.toDate) {
+      query+= " WHERE " + singleTable+ ".slider_id="+"'"+req.body.sliderId+"'" 
+    }
+
+    if(req.body.sliderId && req.body.fromDate || req.body.toDate) {
+      query+= " AND " + singleTable+ ".slider_id="+"'"+req.body.sliderId+"'" 
+    }
+
+    console.log('query',query)
+    query += " LIMIT "+ req.body.limit
+    if(req.body.queryType == 'sqlString') {
+      res.json({sqlString: query, data: []});
+    } else {
+  	  db.query(query)
+  	  .then(function (data) {
+  	    res.json({data: data});
+  	  })
+  	  .catch(function (error) {
+  	    console.log('ERROR:', error)
+  	  })
+    }
   },1000);
 };
 
