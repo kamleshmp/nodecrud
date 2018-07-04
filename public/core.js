@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ng-bootstrap-datepicker']);
+var app = angular.module('app', []);
 
 function mainController($scope, $http) {
     $scope.selectedColumns = {};
@@ -57,6 +57,23 @@ function mainController($scope, $http) {
             });
     };
 
+    $scope.checkAll = function(table){
+        console.log($scope.models[table + 'all'])
+        if($scope.models[table+'all']) {
+            for( var i =0; i < $scope.selectedColumns[table].length ; i++) {
+                var column = $scope.selectedColumns[table][i].column_name;
+                $scope.models[table+column] = true;
+                $scope.addColumn(table, column)
+            }
+        } else {
+            for( var i =0; i < $scope.selectedColumns[table].length ; i++) {
+                var columnName = $scope.selectedColumns[table][i].column_name;
+                $scope.models[table+columnName] = false;
+                $scope.tablesToDownload[table] = []
+            }
+        }
+    }
+
 
 
     setTimeout(function() {
@@ -101,6 +118,25 @@ function mainController($scope, $http) {
 
     $scope.checkFromDate = function(){
         console.log($scope.fromDate)
+    }
+
+    $( function() {
+        $( "#datepicker1, #datepicker2" ).datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+        $( "#datepicker1" ).change(function() {
+            $scope.fromDate = $(this).val();
+        })
+        $( "#datepicker2" ).change(function() {
+            $scope.toDate = $(this).val();
+        })
+      });
+    
+    $scope.resetData = function(){
+        $scope.toDate = '';
+        $scope.fromDate = '';
+        $scope.sliderId = '';
+        $( "#datepicker1, #datepicker2").val('');
     }
 
     $scope.showPreview = function(queryType) {

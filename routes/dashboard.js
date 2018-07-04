@@ -117,11 +117,12 @@ exports.downloadTables = function(req, res) {
       query+= " WHERE " + singleTable+ ".slider_id="+"'"+req.body.sliderId+"'" 
     }
 
-    if(req.body.sliderId && req.body.fromDate || req.body.toDate) {
+    if(req.body.sliderId && (req.body.fromDate || req.body.toDate)) {
       query+= " AND " + singleTable+ ".slider_id="+"'"+req.body.sliderId+"'" 
     }
 
     console.log('query',query)
+    console.log('sliderId', req.body)
     query += " LIMIT "+ req.body.limit
     if(req.body.queryType == 'sqlString') {
       res.json({sqlString: query, data: []});

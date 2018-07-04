@@ -25,6 +25,11 @@
   <link rel="stylesheet" type="text/css" href="./jquery.dropdown.css">
   <script src="./jquery.dropdown.js"></script>
   <script type="text/javascript" src="./ng-table-excel-export.min.js"></script>
+
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
   <style type="text/css">
   .column-panel {
     height: 300px;
@@ -51,7 +56,19 @@
   </style>
 </head>
 <!-- SET THE CONTROLLER AND GET ALL TODOS -->
-
+<script type="text/javascript">
+    $( function() {
+    $( "#datepicker1", "#datepicker2" ).datepicker({
+        dateFormat: 'yy-mm-dd'
+    });
+    $( "#datepicker1" ).change(function() {
+        console.log($(this).val())
+    })
+    $( "#datepicker2" ).change(function() {
+        console.log($(this).val())
+    })
+  } );
+</script>
 <body ng-controller="mainController">
   <nav class="navbar navbar-default">
     <div class="container-fluid">
@@ -122,6 +139,12 @@
                 <div class="panel-heading">Table: {{k}}</div>
                 <div class="column-panel">
                   <div class="panel-body">
+                    <div class="checkbox" >
+                      <label for={{k+'all'}}>
+                        <input id={{k+'all'}} type="checkbox" ng-model="models[k+'all']" ng-change="checkAll(k)" name="">All</label>
+                    </div>
+
+
                     <div class="checkbox" ng-repeat="column in v">
                       <label for={{k+column.column_name}}>
                         <input id={{k+column.column_name}} type="checkbox" ng-model="models[k+column.column_name]" ng-change="addColumn(k, column.column_name)" name="">{{column.column_name}}</label>
@@ -136,13 +159,12 @@
             <table>
                 <tr>
                     <td>From Date 
-                        <input id="datepicker" type="text" data-ng-datepicker data-ng-options="datepickerOptions" data-ng-model="fromDate"></td>
+                        <input id="datepicker1" type="text" ></td>
                     <td>To Date 
-                        <input id="datepicker2" type="text" data-ng-datepicker data-ng-options="datepickerOptions" data-ng-model="toDate"></td>
-                    <td><span class="sliderId">Slider Id </span> <br>
+                        <input id="datepicker2" type="text" ></td>
+                    <td><span class="sliderId">Slider Id </span> 
                         <input  type="text" allow-only-numbers ng-model="sliderId"></td>
-
-                    
+                    <td><button class="btn btn-primary" ng-click="resetData()">Reset</button></td>
                 </tr>
 
                 <tr>
@@ -193,7 +215,3 @@
 
 </html>
 
-<script type="text/javascript">
-    $('#datepicker').attr('readonly', true);
-     $('#datepicker2').attr('readonly', true);
-</script>
