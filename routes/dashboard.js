@@ -6,13 +6,13 @@
 var pgp = require('pg-promise')(/*options*/);
 
 var config = {
-  POSTGRES_USER_NAME: 'postgres', // your postgres username
-  POSTGRES_PASSWORD: 'postgres', // your postgres upassword
-  DATABASE_NAME: 'mydb'
+  POSTGRES_USER_NAME: '', // your postgres username
+  POSTGRES_PASSWORD: '', // your postgres upassword
+  DATABASE_NAME: '' // your database name
 }
 
-
-var db = pgp('postgres://'+config.POSTGRES_USER_NAME+':'+config.POSTGRES_PASSWORD+'@localhost:5432/'+config.DATABASE_NAME)
+var dbPath = 'postgres://'+config.POSTGRES_USER_NAME+':'+config.POSTGRES_PASSWORD+'@localhost:5432/'+config.DATABASE_NAME
+var db = pgp(dbPath) // set your db path
 
 exports.tables = function(req, res){
   db.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
